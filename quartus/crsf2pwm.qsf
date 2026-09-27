@@ -1,0 +1,28 @@
+# Quartus project for crsf2pwm.
+# Device: EPM240T100C5 (MAX II, TQFP-100). Change to match your board.
+
+set_global_assignment -name FAMILY "MAX II"
+set_global_assignment -name DEVICE EPM240T100C5
+set_global_assignment -name TOP_LEVEL_ENTITY crsf2pwm_top
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
+
+# Sources, paths relative to this directory
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/crsf2pwm_top.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/uart_rx.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/crc8.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/crsf_parser.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pwm_out.sv
+set_global_assignment -name SDC_FILE crsf2pwm.sdc
+
+# Unused pins: input with weak pull-up instead of output driving ground.
+# Safe for a board where other things are wired to the pins.
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED WITH WEAK PULL-UP"
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to *
+
+# Pin assignments. Fill in from docs/pinout.md after checking the board.
+# set_location_assignment PIN_12 -to clk
+# set_location_assignment PIN_xx -to rx
+# set_location_assignment PIN_xx -to steer
+# set_location_assignment PIN_xx -to throttle
