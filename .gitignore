@@ -1,0 +1,44 @@
+# Quartus: everything except .qpf .qsf .sdc is regenerated
+quartus/db/
+quartus/incremental_db/
+quartus/output_files/
+quartus/greybox_tmp/
+quartus/simulation/
+quartus/*.qws
+quartus/*.rpt
+quartus/*.summary
+quartus/*.smsg
+quartus/*.jdi
+quartus/*.pin
+quartus/*.done
+quartus/*.sld
+quartus/*.bak
+quartus/*.qarlog
+quartus/c5_pin_model_dump.txt
+
+# Simulation
+sim/build/
+sim/*.vcd
+sim/*.fst
+sim/sim_build/
+sim/results.xml
+__pycache__/
+*.pyc
+
+# KiCad
+hw/*-backups/
+hw/*.kicad_prl
+hw/fp-info-cache
+hw/*.lck
+hw/_autosave-*
+hw/*-save.kicad_*
+hw/*.kicad_sch-bak
+hw/*.kicad_pcb-bak
+hw/*~
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
