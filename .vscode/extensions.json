@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    // SystemVerilog syntax, linting via iverilog, see settings.json
+    "mshr-h.veriloghdl",
+    // waveform viewer inside VS Code: opens sim/build/*.vcd on click
+    "surfer-project.surfer"
+  ]
+}

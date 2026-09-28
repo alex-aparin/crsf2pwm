@@ -36,8 +36,11 @@ hw/*.kicad_sch-bak
 hw/*.kicad_pcb-bak
 hw/*~
 
-# Editors and OS
-.vscode/
+# Editors and OS. Shared VS Code tasks and settings are tracked.
+.vscode/*
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 Thumbs.db

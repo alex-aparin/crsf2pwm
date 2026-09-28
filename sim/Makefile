@@ -3,7 +3,8 @@
 #
 #   make               all testbenches
 #   make tb_top        one testbench (file name in tb/ without extension)
-#   make waves-tb_top  open waveforms
+#   make pwm_out       same as make tb_pwm_out, handy from an editor
+#   make waves-tb_top  open waveforms, loads tb_top.gtkw from here if present
 #   make lint          Verilator lint
 #   make clean
 
@@ -18,12 +19,19 @@ RTL := $(wildcard ../rtl/*.sv)
 TBS := $(patsubst ../tb/%.sv,%,$(wildcard ../tb/tb_*.sv))
 TOP ?= crsf2pwm_top
 
-.PHONY: all clean lint $(TBS)
+# tb_pwm_out and pwm_out name the same testbench, so an editor can run the
+# test for whichever file is open, the module or its testbench.
+MODS  := $(patsubst tb_%,%,$(TBS))
+tbname = $(if $(filter tb_%,$1),$1,tb_$1)
+
+.PHONY: all clean lint $(TBS) $(MODS)
 
 all: $(TBS)
 
 $(TBS): %: build/%.vvp
 	$(VVP) -N $<
+
+$(MODS): %: tb_%
 
 build/%.vvp: ../tb/%.sv $(RTL) | build
 	$(IVERILOG) $(IVFLAGS) -s $* -o $@ $^
@@ -31,8 +39,16 @@ build/%.vvp: ../tb/%.sv $(RTL) | build
 build:
 	mkdir -p build
 
+# Signal layout: save it from GTKWave with File > Write Save File as
+# sim/tb_x.gtkw, it is picked up next time and is worth committing.
+#
+# GTKWave is started in its own session (setsid, util-linux) so it survives
+# when the shell that launched it exits, e.g. a VS Code task terminal. Where
+# setsid is missing it is a plain background job.
+DETACH := $(if $(shell command -v setsid 2>/dev/null),setsid -f,)
+
 waves-%:
-	$(GTKWAVE) build/$*.vcd &
+	$(DETACH) $(GTKWAVE) build/$(call tbname,$*).vcd $(wildcard $(call tbname,$*).gtkw) &
 
 lint:
 	$(VERILATOR) --lint-only -Wall --top-module $(TOP) $(RTL)

@@ -1,0 +1,122 @@
+{
+  // Tasks wrap sim/Makefile. Open a testbench or a module file and press
+  // Ctrl+Shift+B: rtl/pwm_out.sv and tb/tb_pwm_out.sv both run tb_pwm_out.
+  // Other tasks: Terminal > Run Task.
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}/sim"
+  },
+  "tasks": [
+    {
+      "label": "sim: run testbench for current file",
+      "detail": "make <name> in sim/, name taken from the open file",
+      "type": "shell",
+      "command": "make",
+      "args": ["${fileBasenameNoExtension}"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "iverilog",
+        "source": "iverilog",
+        "fileLocation": ["relative", "${workspaceFolder}/sim"],
+        "pattern": {
+          "regexp": "^(\\S+\\.s?vh?):(\\d+):\\s*(?:(error|warning|sorry):\\s*)?(.*)$",
+          "file": 1,
+          "line": 2,
+          "severity": 3,
+          "message": 4
+        }
+      }
+    },
+    {
+      "label": "sim: waves for current file",
+      "detail": "GTKWave on sim/build/<tb>.vcd, with sim/<tb>.gtkw if it exists",
+      "type": "shell",
+      "command": "make",
+      "args": ["waves-${fileBasenameNoExtension}"],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "sim: run + waves for current file",
+      "detail": "run the testbench, then open GTKWave",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "sim: run testbench for current file",
+        "sim: waves for current file"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "sim: all testbenches",
+      "detail": "make in sim/",
+      "type": "shell",
+      "command": "make",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "iverilog",
+        "source": "iverilog",
+        "fileLocation": ["relative", "${workspaceFolder}/sim"],
+        "pattern": {
+          "regexp": "^(\\S+\\.s?vh?):(\\d+):\\s*(?:(error|warning|sorry):\\s*)?(.*)$",
+          "file": 1,
+          "line": 2,
+          "severity": 3,
+          "message": 4
+        }
+      }
+    },
+    {
+      "label": "sim: lint (verilator)",
+      "detail": "make lint in sim/, needs Verilator on PATH",
+      "type": "shell",
+      "command": "make",
+      "args": ["lint"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "verilator",
+        "source": "verilator",
+        "fileLocation": ["relative", "${workspaceFolder}/sim"],
+        "pattern": {
+          "regexp": "^%(Error|Warning)(?:-\\w+)?:\\s+(\\S+):(\\d+):(?:(\\d+):)?\\s*(.*)$",
+          "severity": 1,
+          "file": 2,
+          "line": 3,
+          "column": 4,
+          "message": 5
+        }
+      }
+    },
+    {
+      "label": "sim: clean",
+      "detail": "remove sim/build",
+      "type": "shell",
+      "command": "make",
+      "args": ["clean"],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

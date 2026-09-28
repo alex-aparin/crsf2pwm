@@ -44,9 +44,25 @@ With make:
 cd sim
 make                 all testbenches
 make tb_top          one testbench
+make pwm_out         same as make tb_pwm_out
 make waves-tb_top    open waveforms in GTKWave
 make lint            Verilator lint, if installed
 ```
+
+`make waves-tb_top` also loads `sim/tb_top.gtkw` if it exists. Save one from
+GTKWave with File > Write Save File to keep the signal layout between runs.
+
+## VS Code
+
+`.vscode/` has tasks and recommended extensions. Open a testbench or a module
+file and press Ctrl+Shift+B: the testbench for that file runs in `sim/`, so
+`rtl/pwm_out.sv` and `tb/tb_pwm_out.sv` both run `tb_pwm_out`. Errors from
+Icarus appear in the Problems panel. Other tasks under Terminal > Run Task:
+waves in GTKWave, run + waves, all testbenches, lint, clean.
+
+The Verilog-HDL extension lints the open file with Icarus on save. The Surfer
+extension opens a `.vcd` from `sim/build/` inside VS Code as an alternative
+to GTKWave.
 
 ## Build and program
 

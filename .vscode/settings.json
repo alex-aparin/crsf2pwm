@@ -1,0 +1,20 @@
+{
+  // Verilog-HDL/SystemVerilog extension (mshr-h.veriloghdl): lint the open
+  // file with Icarus on save. The extension adds -t null and -g2012 itself.
+  // Modules that are instantiated but not in the open file are looked up in
+  // rtl/ by file name (-y), so tb/ and rtl/ files lint without a file list.
+  "verilog.linting.linter": "iverilog",
+  "verilog.linting.iverilog.arguments": "-Wall -y ../rtl -Y .sv",
+  "verilog.linting.iverilog.runAtFileLocation": true,
+
+  "[systemverilog]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.rulers": [80]
+  },
+  "[verilog]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.rulers": [80]
+  }
+}
