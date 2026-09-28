@@ -16,7 +16,7 @@ tb/        testbenches for Icarus Verilog and a Python reference model
 sim/       Makefile for running simulations, waveforms land here
 quartus/   Quartus project: .qpf, .qsf, .sdc
 hw/        KiCad board project
-docs/      notes: CRSF protocol, pinout
+docs/      notes: CRSF protocol, servo PWM, pinout
 ```
 
 ## Tools (Windows)
@@ -87,4 +87,5 @@ quartus_pgm -m jtag -o "p;output_files/crsf2pwm.pof"
 
 ## Status
 
-Skeleton only. No logic implemented yet.
+`pwm_out` is implemented and waits for its testbench `tb_pwm_out`.
+Everything else is a skeleton.
