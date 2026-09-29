@@ -87,5 +87,5 @@ quartus_pgm -m jtag -o "p;output_files/crsf2pwm.pof"
 
 ## Status
 
-`pwm_out` is implemented and waits for its testbench `tb_pwm_out`.
-Everything else is a skeleton.
+`pwm_out` is implemented and `tb_pwm_out` passes. Everything else is a
+skeleton.
