@@ -1,5 +1,7 @@
 # crsf2pwm
 
+[![sim](https://github.com/alex-aparin/crsf2pwm/actions/workflows/sim.yml/badge.svg)](https://github.com/alex-aparin/crsf2pwm/actions/workflows/sim.yml)
+
 CRSF-to-PWM converter for an RC car: receives CRSF from an ExpressLRS or
 Crossfire receiver over UART and outputs two servo PWM signals, one for the
 steering servo and one for the motor ESC. Implemented on an Altera MAX II
@@ -70,6 +72,14 @@ task turns red. A watchdog ends a hung run.
 
 `make waves-tb_top` also loads `sim/tb_top.gtkw` if it exists. Save one from
 GTKWave with File > Write Save File to keep the signal layout between runs.
+
+## Continuous integration
+
+`.github/workflows/sim.yml` runs on every push and pull request: all
+testbenches in Icarus (`make -C sim -k all`), the Python model self-test with
+a check that the committed `tb/vectors/` match the generator, and Verilator
+lint of the RTL with `-Wall`. The waveforms of a failed run are attached to
+the run as an artifact for a week. The badge above shows the state of `main`.
 
 ## VS Code
 

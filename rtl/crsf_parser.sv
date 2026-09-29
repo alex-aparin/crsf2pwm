@@ -49,8 +49,8 @@ module crsf_parser #(
 
   localparam int GAP_CLKS = CLK_HZ / 1_000_000 * GAP_US;
   localparam int GAP_W    = $clog2(GAP_CLKS);
-  localparam logic [GAP_W-1:0] GAP_ONE  = 1;
-  localparam logic [GAP_W-1:0] GAP_LAST = GAP_CLKS - 1;
+  localparam logic [GAP_W-1:0] GAP_ONE  = GAP_W'(1);
+  localparam logic [GAP_W-1:0] GAP_LAST = GAP_W'(GAP_CLKS - 1);
 
   typedef enum logic [1:0] {S_SYNC, S_LEN, S_TYPE, S_BODY} state_t;
 
@@ -146,8 +146,8 @@ module crsf_parser #(
     for (genvar j = 0; j < 11; j++) begin : g_map
       localparam int PA = 11 * CH_A + j;
       localparam int PB = 11 * CH_B + j;
-      localparam logic [5:0] RA = 23 - PA / 8;
-      localparam logic [5:0] RB = 23 - PB / 8;
+      localparam logic [5:0] RA = 6'(23 - PA / 8);
+      localparam logic [5:0] RB = 6'(23 - PB / 8);
       assign src_a[j] = byte_in[PA % 8];
       assign hit_a[j] = (remaining == RA);
       assign src_b[j] = byte_in[PB % 8];

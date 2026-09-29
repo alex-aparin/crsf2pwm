@@ -46,9 +46,11 @@ module crsf2pwm_top #(
     rx_sync <= rx_meta;
   end
 
-  // UART
+  // UART. frame_err is not used here: a bad byte simply never becomes a
+  // good frame. The "unused_" name keeps lint quiet about it.
   logic [7:0] rx_data;
   logic       rx_valid;
+  logic       unused_frame_err;
 
   uart_rx #(
     .CLK_HZ (CLK_HZ),
@@ -58,7 +60,7 @@ module crsf2pwm_top #(
     .rx        (rx_sync),
     .data      (rx_data),
     .valid     (rx_valid),
-    .frame_err ()
+    .frame_err (unused_frame_err)
   );
 
   // Frame parser
@@ -94,8 +96,8 @@ module crsf2pwm_top #(
   // Link watchdog. All registers zero at power-up is the safe state:
   // link_ok = 0 and ever_valid = 0 mean no pulses at all.
   localparam int FS_W = $clog2(FAILSAFE_PERIODS + 1);
-  localparam logic [FS_W-1:0] FS_ONE  = 1;
-  localparam logic [FS_W-1:0] FS_LAST = FAILSAFE_PERIODS - 1;
+  localparam logic [FS_W-1:0] FS_ONE  = FS_W'(1);
+  localparam logic [FS_W-1:0] FS_LAST = FS_W'(FAILSAFE_PERIODS - 1);
 
   logic [FS_W-1:0] missed     = '0;     // period starts since the last good frame
   logic            link_ok    = 1'b0;
@@ -113,7 +115,7 @@ module crsf2pwm_top #(
   end
 
   // Outputs
-  localparam logic [10:0] THR_FAILSAFE_V = THROTTLE_FAILSAFE;
+  localparam logic [10:0] THR_FAILSAFE_V = 11'(THROTTLE_FAILSAFE);
 
   logic [10:0] thr_cmd;
   assign thr_cmd = link_ok ? thr_val : THR_FAILSAFE_V;

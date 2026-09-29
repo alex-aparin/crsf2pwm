@@ -36,9 +36,9 @@ module uart_rx #(
   localparam int CLKS_PER_BIT = CLK_HZ / BAUD;           // 119 at 50 MHz, 420 kbaud
   localparam int CNT_W        = $clog2(CLKS_PER_BIT);
 
-  localparam logic [CNT_W-1:0] CNT_ONE   = 1;
-  localparam logic [CNT_W-1:0] BIT_LAST  = CLKS_PER_BIT - 1;      // one bit period
-  localparam logic [CNT_W-1:0] HALF_LAST = CLKS_PER_BIT / 2 - 1;  // half a bit period
+  localparam logic [CNT_W-1:0] CNT_ONE   = CNT_W'(1);
+  localparam logic [CNT_W-1:0] BIT_LAST  = CNT_W'(CLKS_PER_BIT - 1);      // one bit period
+  localparam logic [CNT_W-1:0] HALF_LAST = CNT_W'(CLKS_PER_BIT / 2 - 1);  // half a bit period
 
   typedef enum logic [2:0] {S_IDLE, S_START, S_DATA, S_STOP, S_WAIT} state_t;
 

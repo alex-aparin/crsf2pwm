@@ -1,0 +1,83 @@
+# Simulation on every push and pull request.
+#
+#   sim    the five Icarus testbenches through sim/Makefile; the VCDs of a
+#          failed run are kept as an artifact for a week
+#   model  Python model self-test, and the committed tb/vectors must match
+#          what the generator produces
+#   lint   Verilator lint of the RTL, -Wall, must be clean
+#
+# ubuntu-22.04 ships Icarus Verilog 11.0, the version the testbenches were
+# developed with. ubuntu-latest (24.04) has 12.0 and should work as well.
+# Lint runs on ubuntu-latest for the newer Verilator (5.020); the Makefile
+# handles warning codes that this version does not know yet.
+
+name: sim
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sim:
+    name: testbenches, Icarus Verilog
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends iverilog
+          iverilog -V | head -1
+
+      - name: Run all testbenches
+        # -k: keep going after a failure so every testbench reports
+        run: make -C sim -k all
+
+      - name: Keep the waveforms of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: waveforms
+          path: sim/build/*.vcd
+          retention-days: 7
+
+  model:
+    name: Python model and vectors
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Model self-test
+        run: python3 tb/model/crsf.py
+
+      - name: Committed vectors match the generator
+        run: |
+          python3 tb/model/gen_vectors.py
+          git diff --exit-code -- tb/vectors
+
+  lint:
+    name: Verilator lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Verilator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends verilator
+          verilator --version
+
+      - name: Lint
+        run: make -C sim lint

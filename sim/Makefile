@@ -51,8 +51,12 @@ DETACH := $(if $(shell command -v setsid 2>/dev/null),setsid -f,)
 waves-%:
 	$(DETACH) $(GTKWAVE) build/$(call tbname,$*).vcd $(wildcard $(call tbname,$*).gtkw) &
 
+# PROCASSINIT is Verilator's objection to registers that get their power-up
+# value in the declaration and are then written in always_ff. That is the
+# style of this design on purpose: no reset, see docs/design.md. -Wfuture-
+# lets older Verilators that do not know the code accept the -Wno-.
 lint:
-	$(VERILATOR) --lint-only -Wall --top-module $(TOP) $(RTL)
+	$(VERILATOR) --lint-only -Wall -Wfuture-PROCASSINIT -Wno-PROCASSINIT --top-module $(TOP) $(RTL)
 
 # Test vectors are committed; this only needs Python when they change.
 vectors:

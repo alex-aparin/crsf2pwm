@@ -42,11 +42,11 @@ module pwm_timebase #(
   localparam int CNT_W        = $clog2(PERIOD_TICKS);
 
   // Constants sized to their registers, so no expression mixes widths.
-  localparam logic [ACC_W-1:0] ACC_STEP_V  = ACC_STEP;
-  localparam logic [ACC_W-1:0] ACC_LAST    = ACC_MOD - ACC_STEP;
-  localparam logic [CNT_W-1:0] CNT_ONE     = 1;
-  localparam logic [CNT_W-1:0] PERIOD_LAST = PERIOD_TICKS - 1;
-  localparam logic [CNT_W-1:0] HEAD_LAST   = HEAD_TICKS - 1;
+  localparam logic [ACC_W-1:0] ACC_STEP_V  = ACC_W'(ACC_STEP);
+  localparam logic [ACC_W-1:0] ACC_LAST    = ACC_W'(ACC_MOD - ACC_STEP);
+  localparam logic [CNT_W-1:0] CNT_ONE     = CNT_W'(1);
+  localparam logic [CNT_W-1:0] PERIOD_LAST = CNT_W'(PERIOD_TICKS - 1);
+  localparam logic [CNT_W-1:0] HEAD_LAST   = CNT_W'(HEAD_TICKS - 1);
 
   logic [ACC_W-1:0] acc    = '0;
   logic             tick_q = 1'b0;

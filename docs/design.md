@@ -141,6 +141,12 @@ carry a watchdog against hangs.
 | `tb_pwm_out` | widths for 172/992/1811/0/2047 within +-1 us, period 20 ms, value change mid-pulse, no retrigger, enable drop mid-pulse, silence while disabled | about 40 s |
 | `tb_top` | bytes on rx to pulse widths; power-up silence, link up, value changes, bad and foreign frames between good ones, failsafe not premature, failsafe reached, throttle neutral in failsafe, recovery | `FAILSAFE_PERIODS` = 3 to keep it short; about 1.5 min |
 
+The same suite runs in GitHub Actions on every push
+(`.github/workflows/sim.yml`), together with the Python model self-test, a
+check that the committed vectors match the generator, and Verilator lint.
+`make lint` with `-Wall` is clean under Verilator 5.052 for both
+`crsf2pwm_top` and `pwm_out`.
+
 Not verified here: synthesis. Quartus is not installed on the Linux box
 the simulations run on; the LE table above is an estimate until the first
 compile.
@@ -166,9 +172,15 @@ compile.
 - **Shadows plus output registers in the parser** are the price of the
   atomic-update contract: a bad frame never shows, the channels are never
   half old and half new.
-- **Icarus 11 quirks met on the way**, so nobody trips again: no size
-  casts `N'(x)`, no `'{}` array literals in declarations, `before` is a
-  keyword, an initialiser on a variable declared inside a `begin` block
-  runs once at time 0, empty `()` task ports draw a warning, and
-  `$readmemh` warns when the array is larger than the file, hence the
-  generated `crc8_size.svh`.
+- **Sized constants through casts.** `localparam logic [W-1:0] X = W'(expr)`
+  is the one form that Icarus 11 accepts, Verilator lints clean and Quartus
+  does not truncate silently. Plain `= expr` draws WIDTHTRUNC from
+  Verilator, a plain `int` constant draws WIDTHEXPAND at every use.
+- **Verilator's PROCASSINIT is switched off** in `make lint`: it objects to
+  registers initialised in their declaration and written in `always_ff`,
+  which is exactly the no-reset style chosen here.
+- **Icarus 11 quirks met on the way**, so nobody trips again: no `'{}`
+  array literals in declarations, `before` is a keyword, an initialiser on
+  a variable declared inside a `begin` block runs once at time 0, empty
+  `()` task ports draw a warning, and `$readmemh` warns when the array is
+  larger than the file, hence the generated `crc8_size.svh`.
