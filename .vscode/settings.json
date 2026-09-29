@@ -4,7 +4,7 @@
   // Modules that are instantiated but not in the open file are looked up in
   // rtl/ by file name (-y), so tb/ and rtl/ files lint without a file list.
   "verilog.linting.linter": "iverilog",
-  "verilog.linting.iverilog.arguments": "-Wall -y ../rtl -Y .sv",
+  "verilog.linting.iverilog.arguments": "-Wall -y ../rtl -Y .sv -I ../tb/lib",
   "verilog.linting.iverilog.runAtFileLocation": true,
 
   "[systemverilog]": {

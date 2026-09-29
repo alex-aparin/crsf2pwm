@@ -5,19 +5,32 @@ Crossfire receiver over UART and outputs two servo PWM signals, one for the
 steering servo and one for the motor ESC. Implemented on an Altera MAX II
 CPLD (EPM240).
 
-This is a learning project: the goal is to get comfortable with Verilog,
-simulation, and the Quartus flow.
-
 ## Layout
 
 ```
-rtl/       synthesizable code, the only thing that goes into Quartus
-tb/        testbenches for Icarus Verilog and a Python reference model
-sim/       Makefile for running simulations, waveforms land here
-quartus/   Quartus project: .qpf, .qsf, .sdc
-hw/        KiCad board project
-docs/      notes: CRSF protocol, servo PWM, pinout
+rtl/          synthesizable code, the only thing that goes into Quartus
+tb/           testbenches for Icarus Verilog, one per module plus tb_top
+tb/lib/       helpers shared by the testbenches (CRC, frame building)
+tb/model/     Python reference model and the test vector generator
+tb/vectors/   generated vectors, committed, `make vectors` regenerates them
+sim/          Makefile for running simulations, waveforms land here
+quartus/      Quartus project: .qpf, .qsf, .sdc
+hw/           KiCad board project
+docs/         notes: design, CRSF protocol, servo PWM, pinout
 ```
+
+## Design
+
+```
+rx -> 2 FF sync -> uart_rx -> crsf_parser -> steer_val ----------> pwm_chan -> steer
+                                          -> thr_val -> failsafe mux -> pwm_chan -> throttle
+                                          -> frame_valid -> link watchdog
+                              pwm_timebase -> tick, start, head -> both channels, watchdog
+```
+
+`docs/design.md` has the module contracts, the timing, the failsafe policy,
+the LE budget and the reasoning behind the choices. `docs/crsf.md` and
+`docs/servo_pwm.md` cover the two protocols.
 
 ## Tools (Windows)
 
@@ -26,6 +39,7 @@ docs/      notes: CRSF protocol, servo PWM, pinout
 - Quartus Prime Lite with the MAX II device package
 - USB Blaster driver from `<quartus>/drivers/usb-blaster`
 - Optional: GNU Make (MSYS2 or `winget install GnuWin32.Make`) for `sim/Makefile`
+- Optional: Python 3, only to regenerate `tb/vectors/` or to play with the model
 
 ## Simulation
 
@@ -33,7 +47,7 @@ Without make, from the `sim` directory:
 
 ```
 mkdir build
-iverilog -g2012 -Wall -s tb_top -o build/tb_top.vvp ../tb/tb_top.sv ../rtl/*.sv
+iverilog -g2012 -Wall -I ../tb/lib -s tb_top -o build/tb_top.vvp ../tb/tb_top.sv ../rtl/*.sv
 vvp -N build/tb_top.vvp
 gtkwave build/tb_top.vcd
 ```
@@ -47,7 +61,12 @@ make tb_top          one testbench
 make pwm_out         same as make tb_pwm_out
 make waves-tb_top    open waveforms in GTKWave
 make lint            Verilator lint, if installed
+make vectors         regenerate tb/vectors from the Python model
 ```
+
+Every testbench is self-checking: it prints `PASS` and exits 0, or prints the
+failing checks and exits 1 through `$stop`, so `make` fails and the VS Code
+task turns red. A watchdog ends a hung run.
 
 `make waves-tb_top` also loads `sim/tb_top.gtkw` if it exists. Save one from
 GTKWave with File > Write Save File to keep the signal layout between runs.
@@ -74,18 +93,3 @@ cd quartus
 quartus_sh --flow compile crsf2pwm
 quartus_pgm -m jtag -o "p;output_files/crsf2pwm.pof"
 ```
-
-## Roadmap
-
-1. `uart_rx` and `tb_uart_rx`: receive a byte at 420 kbaud.
-2. `crc8` and its test: CRC-8/DVB-S2, polynomial 0xD5.
-3. `crsf_parser`: parse frame type 0x16, extract two channels, strobe on valid CRC.
-4. `pwm_out`: 20 ms period, 988..2012 us pulse from a 172..1811 value.
-5. `crsf2pwm_top` and `tb_top`: end-to-end test from bytes on rx to pulse width.
-6. Quartus: synthesis, LE count, warnings, timing.
-7. Pin assignment, programming, check with a logic analyzer.
-
-## Status
-
-`pwm_out` is implemented and `tb_pwm_out` passes. Everything else is a
-skeleton.

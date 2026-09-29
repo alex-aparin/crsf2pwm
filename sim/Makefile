@@ -6,6 +6,7 @@
 #   make pwm_out       same as make tb_pwm_out, handy from an editor
 #   make waves-tb_top  open waveforms, loads tb_top.gtkw from here if present
 #   make lint          Verilator lint
+#   make vectors       regenerate tb/vectors from the Python model
 #   make clean
 
 IVERILOG  ?= iverilog
@@ -13,7 +14,7 @@ VVP       ?= vvp
 GTKWAVE   ?= gtkwave
 VERILATOR ?= verilator
 
-IVFLAGS ?= -g2012 -Wall
+IVFLAGS ?= -g2012 -Wall -I ../tb/lib
 
 RTL := $(wildcard ../rtl/*.sv)
 TBS := $(patsubst ../tb/%.sv,%,$(wildcard ../tb/tb_*.sv))
@@ -24,7 +25,7 @@ TOP ?= crsf2pwm_top
 MODS  := $(patsubst tb_%,%,$(TBS))
 tbname = $(if $(filter tb_%,$1),$1,tb_$1)
 
-.PHONY: all clean lint $(TBS) $(MODS)
+.PHONY: all clean lint vectors $(TBS) $(MODS)
 
 all: $(TBS)
 
@@ -52,6 +53,11 @@ waves-%:
 
 lint:
 	$(VERILATOR) --lint-only -Wall --top-module $(TOP) $(RTL)
+
+# Test vectors are committed; this only needs Python when they change.
+vectors:
+	python3 ../tb/model/crsf.py
+	python3 ../tb/model/gen_vectors.py
 
 clean:
 	rm -rf build

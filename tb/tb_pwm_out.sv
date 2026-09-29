@@ -65,11 +65,12 @@ module tb_pwm_out;
     real   w, p, t0;
     string name;
 
-    // Dump only what is cheap: pwm changes twice per period, the inputs and
-    // the shadow registers once. clk would add 50 million lines per second
-    // of simulated time, dut.cnt 1.6 million. Add them when debugging.
+    // Dump only what is cheap: pwm and head change twice per period, the
+    // inputs and en_q once. clk would add 50 million lines per second of
+    // simulated time, the period counter 1.6 million, the channel's down
+    // counter up to 3455 per period. Add them when debugging.
     $dumpfile("build/tb_pwm_out.vcd");
-    $dumpvars(0, value, enable, pwm, dut.width, dut.en_q);
+    $dumpvars(0, value, enable, pwm, dut.u_timebase.head, dut.u_chan.en_q);
 
     vals[0] = 172; vals[1] = 992; vals[2] = 1811; vals[3] = 0; vals[4] = 2047;
 

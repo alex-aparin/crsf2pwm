@@ -13,6 +13,8 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/crsf2pwm_top.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/uart_rx.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/crc8.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/crsf_parser.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pwm_timebase.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pwm_chan.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pwm_out.sv
 set_global_assignment -name SDC_FILE crsf2pwm.sdc
 

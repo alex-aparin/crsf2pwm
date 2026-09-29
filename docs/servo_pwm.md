@@ -77,18 +77,32 @@ until the first connection so the ESC can calibrate. Failsafe after 1 s
 without a valid packet or at link quality 0.
 https://www.expresslrs.org/hardware/pwm-receivers/
 
-## How pwm_out does it
+## How the outputs are made
+
+Two modules, see docs/design.md for the reasoning.
+
+`pwm_timebase`, one per design:
 
 - Tick of 0.625 us, one CRSF unit, from a fractional divider: at 50 MHz
   an accumulator adds 8 every clock modulo 250, a tick on every wrap,
   50 MHz * 8 / 250 = 1.6 MHz. Ticks are 32, 31, 31, 31 clocks apart.
 - Period counter 0..31999 in ticks, 15 bits.
-- Width in ticks = value + 1408, 12 bits, at most 3455.
-- value and enable are latched once per period, in the clock the counter
-  wraps. The comparator sees only the latched copies, so a new CRSF frame
-  mid-period never tears or retriggers a pulse.
-- Output register: pwm = en_q && (cnt < width). High for exactly width
-  ticks.
+- `start`: the last clock of a period. `head`: high for the first 1408
+  ticks of every period, the 880 us that every pulse contains.
+
+`pwm_chan`, one per output:
+
+- On `start` it loads `value` into an 11-bit down counter and latches
+  `enable`. The comparator and the width latch of the textbook design are
+  replaced by this counter: no adder, no 15-bit compare.
+- The pulse is high while `head` or while the counter is not zero; the
+  counter runs only after `head` ends. Width = 1408 + value ticks exactly.
+- Because value and enable are sampled once per period, a new CRSF frame
+  mid-period never tears or retriggers a pulse, and enable = 0 stops the
+  pulses from the next period on.
+
+`pwm_out` is the two together for a single output; it is what
+`tb_pwm_out` tests.
 
 ## Testbench checklist for tb_pwm_out
 
