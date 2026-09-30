@@ -28,12 +28,14 @@ module crsf2pwm_top #(
   parameter int STEER_CH          = 0,           // CRSF channel for steering
   parameter int THROTTLE_CH       = 1,           // CRSF channel for throttle
   parameter int FAILSAFE_PERIODS  = 25,          // 20 ms periods without a frame
-  parameter int THROTTLE_FAILSAFE = 992          // throttle value while the link is down
+  parameter int THROTTLE_FAILSAFE = 992,         // throttle value while the link is down
+  parameter bit LED_ACTIVE_LOW    = 1'b0         // 1 for boards whose LEDs light on 0; the Saylinx lights on 1
 ) (
-  input  wire  clk,       // 50 MHz
-  input  wire  rx,        // CRSF from the receiver, 3.3 V, idle high
-  output logic steer,     // PWM to the steering servo
-  output logic throttle   // PWM to the motor ESC
+  input  wire        clk,       // 50 MHz
+  input  wire        rx,        // CRSF from the receiver, 3.3 V, idle high
+  output logic       steer,     // PWM to the steering servo
+  output logic       throttle,  // PWM to the motor ESC
+  output logic [3:0] led        // status, see the end of the file; leave open if unused
 );
 
   // rx synchroniser: rx is asynchronous, two flops keep metastability
@@ -139,6 +141,23 @@ module crsf2pwm_top #(
     .enable (ever_valid),
     .pwm    (throttle)
   );
+
+  // Status LEDs for bring-up, cheap enough to keep:
+  //   led[0]  link up: good RC frames within the failsafe window
+  //   led[1]  blinks while frames arrive, one toggle per 32 good frames
+  //           (about 4 Hz at the 250 Hz packet rate)
+  //   led[2]  at least one good frame since power-up
+  //   led[3]  glows while bytes arrive on rx, whatever they are: the line
+  //           is low for part of every byte
+  logic [5:0] blink = '0;
+
+  always_ff @(posedge clk) begin
+    if (frame_valid) blink <= blink + 6'd1;
+  end
+
+  logic [3:0] led_on;
+  assign led_on = {~rx_sync, ever_valid, blink[5], link_ok};
+  assign led    = LED_ACTIVE_LOW ? ~led_on : led_on;
 
 endmodule
 

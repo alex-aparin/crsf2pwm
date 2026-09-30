@@ -1,9 +1,11 @@
 # Quartus revision for a Cyclone IV E board. Same sources as the MAX II
 # revision (crsf2pwm.qsf), different device and pins.
 #
-# Device: EP4CE6E22C8 is the most common part on cheap Cyclone IV boards.
-# Check the marking on the chip and change it if yours differs
-# (EP4CE10E22C8, EP4CE10F17C8, EP4CE15F23C8 ...).
+# Device: EP4CE6F17C8, the 256-pin BGA EP4CE6 (no visible leads). The
+# speed grade (C6/C7/C8) only changes the timing model; the design has
+# 12 ns of slack at C8, so any of them works. Pins on this package are
+# named like PIN_E1; the 50 MHz oscillator pin is board specific and
+# still to be confirmed.
 #
 # Compile:  quartus_sh --flow compile crsf2pwm -c crsf2pwm_c4
 # Program:  quartus_pgm -m jtag -o "p;output_files/crsf2pwm_c4.sof"
@@ -12,7 +14,7 @@
 #           Files) and program that instead.
 
 set_global_assignment -name FAMILY "Cyclone IV E"
-set_global_assignment -name DEVICE EP4CE6E22C8
+set_global_assignment -name DEVICE EP4CE6F17C8
 set_global_assignment -name TOP_LEVEL_ENTITY crsf2pwm_top
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 
@@ -37,11 +39,18 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to *
 # the configuration flash type decides the .jic conversion later.
 # set_global_assignment -name CYCLONEIII_CONFIGURATION_DEVICE EPCS16
 
-# Pin assignments. Fill in from docs/pinout.md after checking the board.
-# clk must be on a dedicated clock input (CLK0..CLK15 on the E22 package).
-# set_location_assignment PIN_23 -to clk
-# set_location_assignment PIN_xx -to rx
-# set_location_assignment PIN_xx -to steer
-# set_location_assignment PIN_xx -to throttle
+# Pin assignments, see docs/pinout.md. The board is a clone of the ALINX
+# AX4010, pins from its documentation: 50 MHz oscillator on E1 (a dedicated
+# clock input), LEDs D9 C9 F9 E10, headers are plain GPIO.
+set_location_assignment PIN_E1 -to clk
+# Right header seen from the bottom: pin 3, 5, 7; GND on pin 1.
+set_location_assignment PIN_T14 -to rx
+set_location_assignment PIN_T13 -to steer
+set_location_assignment PIN_T12 -to throttle
+# Status LEDs, LED0..LED3 on the board
+set_location_assignment PIN_D9  -to led[0]
+set_location_assignment PIN_C9  -to led[1]
+set_location_assignment PIN_F9  -to led[2]
+set_location_assignment PIN_E10 -to led[3]
 
 set_global_assignment -name LAST_QUARTUS_VERSION "25.1std.0 Lite Edition"

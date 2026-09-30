@@ -19,14 +19,15 @@
 #
 # Quartus Prime
 # Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
-# Date created = 13:54:12  September 30, 2026
+# Date created = 15:13:42  September 30, 2026
 #
 # -------------------------------------------------------------------------- #
 
 QUARTUS_VERSION = "25.1"
-DATE = "13:54:12  September 30, 2026"
+DATE = "15:13:42  September 30, 2026"
 
 # Revisions
 
 PROJECT_REVISION = "crsf2pwm_c4"
+PROJECT_REVISION = "clock_probe"
 PROJECT_REVISION = "crsf2pwm"

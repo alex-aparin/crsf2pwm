@@ -8,5 +8,5 @@ derive_clock_uncertainty
 # rx is asynchronous to clk and goes through a synchronizer; no timing check.
 set_false_path -from [get_ports rx]
 
-# PWM outputs: servos do not care about nanoseconds.
-set_false_path -to [get_ports {steer throttle}]
+# PWM outputs and LEDs: servos and eyes do not care about nanoseconds.
+set_false_path -to [get_ports {steer throttle led[*]}]

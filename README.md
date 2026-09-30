@@ -4,8 +4,10 @@
 
 CRSF-to-PWM converter for an RC car: receives CRSF from an ExpressLRS or
 Crossfire receiver over UART and outputs two servo PWM signals, one for the
-steering servo and one for the motor ESC. Implemented on an Altera MAX II
-CPLD (EPM240).
+steering servo and one for the motor ESC. Plain synthesisable
+SystemVerilog, one clock, no vendor primitives. The current target is a
+Cyclone IV E development board; a MAX II EPM240 revision exists but the
+design is a few logic cells too big for it.
 
 ## Layout
 
@@ -16,9 +18,10 @@ tb/lib/       helpers shared by the testbenches (CRC, frame building)
 tb/model/     Python reference model and the test vector generator
 tb/vectors/   generated vectors, committed, `make vectors` regenerates them
 sim/          Makefile for running simulations, waveforms land here
-quartus/      Quartus project: .qpf, .qsf, .sdc
+quartus/      Quartus project: .qpf, one .qsf per revision, .sdc, the clock probe
+tools/        build, JTAG check, program, udev rule for the USB Blaster
 hw/           KiCad board project
-docs/         notes: design, CRSF protocol, servo PWM, pinout
+docs/         notes: design, CRSF protocol, servo PWM, pinout, board bring-up
 ```
 
 ## Design
@@ -34,14 +37,24 @@ rx -> 2 FF sync -> uart_rx -> crsf_parser -> steer_val ----------> pwm_chan -> s
 the LE budget and the reasoning behind the choices. `docs/crsf.md` and
 `docs/servo_pwm.md` cover the two protocols.
 
-## Tools (Windows)
+## Tools (Linux)
 
-- Icarus Verilog with GTKWave: installer from https://bleyer.org/icarus/
-  or `winget install Icarus.Verilog`
-- Quartus Prime Lite with the MAX II device package
-- USB Blaster driver from `<quartus>/drivers/usb-blaster`
-- Optional: GNU Make (MSYS2 or `winget install GnuWin32.Make`) for `sim/Makefile`
-- Optional: Python 3, only to regenerate `tb/vectors/` or to play with the model
+Simulation and lint from the distribution:
+
+```
+sudo apt install iverilog gtkwave make python3 verilator
+```
+
+Quartus Prime Lite for synthesis and programming: the small installer from
+altera.com (`qinst-lite-linux-<version>.run`, free, needs an account),
+components Quartus Prime plus the Cyclone IV device support, and MAX II if
+the CPLD revision matters; Questa is not needed. It lands in
+`~/altera_lite/<version>/quartus`, which is not on PATH: the scripts in
+`tools/` find it by themselves, and `. tools/quartus-env.sh` puts it on
+PATH for a shell. The USB Blaster needs `tools/udev-install.sh` once.
+
+Verified with Icarus 11, Verilator 5.052, Quartus Prime Lite 25.1std on
+Ubuntu 22.04.
 
 ## Simulation
 
@@ -95,11 +108,30 @@ to GTKWave.
 
 ## Build and program
 
-Open `quartus/crsf2pwm.qpf` in Quartus and run Start Compilation, then
-Programmer with the USB Blaster. The same from the Quartus command shell:
+The Quartus project `quartus/crsf2pwm.qpf` has three revisions:
+
+| Revision | Target | Output |
+|---|---|---|
+| `crsf2pwm_c4` | the Saylinx Cyclone IV board, EP4CE6F17C8N | `.sof`, and `.jic` for the flash |
+| `clock_probe` | the same board, bring-up helper: oscillator to LEDs and header pins | `.sof` |
+| `crsf2pwm` | MAX II EPM240 | `.pof`; does not fit yet, see `docs/design.md` |
+
+Everything goes through the scripts in `tools/`, which find Quartus, check
+the cable and print the numbers that matter:
 
 ```
-cd quartus
-quartus_sh --flow compile crsf2pwm
-quartus_pgm -m jtag -o "p;output_files/crsf2pwm.pof"
+tools/udev-install.sh            once: let Quartus open the USB Blaster
+tools/jtag-check.sh              cable found? board answering?
+tools/build.sh [revision]        compile, default crsf2pwm_c4; errors, warnings by code, LEs, slack
+tools/program.sh [revision]      into the FPGA over JTAG, gone at power-off
+tools/program.sh --flash         into the configuration flash, loads at every power-up
 ```
+
+The step-by-step procedure with what to expect at each step, from the
+first `jtagconfig` to the car, is `docs/bringup.md`. The GUI works too:
+open the `.qpf`, pick the revision under Project > Revisions, Start
+Compilation, Programmer.
+
+Current state: the Cyclone IV revision compiles clean in Quartus Prime
+Lite 25.1 (273 LEs, Fmax well above 50 MHz) with the pins from
+`docs/pinout.md`. Not yet confirmed on the board.
