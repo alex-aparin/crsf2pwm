@@ -22,7 +22,7 @@ low.
 | Net | Module port | Cyclone IV pin | EPM240 pin | Board connector | Notes |
 |---|---|---|---|---|---|
 | CLK50 | clk | E1 | | on-board oscillator | 50 MHz, dedicated clock input |
-| CRSF_RX | rx | T14 | | right header pin 3, GND pin 1 | 3.3 V, idle high; receiver RX pin left open |
+| CRSF_RX | rx | M2 | | on-board USB-UART bridge, PC -> FPGA | frames from a PC over the board's mini-USB; for a receiver switch to T14 (right header pin 3, GND pin 1), 3.3 V, idle high, receiver RX pin left open |
 | STEER | steer | T13 | | right header pin 5 | servo powered separately, 220 ohm .. 1 k series resistor |
 | THROTTLE | throttle | T12 | | right header pin 7 | ESC powered separately, same resistor |
 | LED0..3 | led[0..3] | D9, C9, F9, E10 | | on-board LEDs, light on 1 | status: link, frames, first frame, rx activity |

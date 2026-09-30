@@ -43,8 +43,14 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to *
 # AX4010, pins from its documentation: 50 MHz oscillator on E1 (a dedicated
 # clock input), LEDs D9 C9 F9 E10, headers are plain GPIO.
 set_location_assignment PIN_E1 -to clk
-# Right header seen from the bottom: pin 3, 5, 7; GND on pin 1.
-set_location_assignment PIN_T14 -to rx
+# CRSF input: the board's USB-UART bridge (CH340 behind the mini-USB),
+# M2 carries PC -> FPGA, so frames come from a pyserial script over
+# /dev/ttyUSB0. N1 (FPGA -> PC) is unassigned: reserved as input with a
+# pull-up, the bridge sees an idle line. For a receiver on the header use
+# T14 instead (right header seen from the bottom, pin 3, GND on pin 1).
+set_location_assignment PIN_M2 -to rx
+# set_location_assignment PIN_T14 -to rx
+# PWM outputs on the right header: pins 5 and 7.
 set_location_assignment PIN_T13 -to steer
 set_location_assignment PIN_T12 -to throttle
 # Status LEDs, LED0..LED3 on the board

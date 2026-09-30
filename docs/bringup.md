@@ -75,18 +75,22 @@ That is correct: no frame yet, no pulses, the ESC would not arm. The LEDs:
 | LED2 | at least one good frame since power-up |
 | LED3 | glowing while bytes arrive on rx, valid or not |
 
-Feeding frames from the PC instead of a receiver: a USB-UART adapter, its
-TX to header pin 3 and GND to pin 1, and a pyserial script built on
-`tb/model/crsf.py` sending `rc_frame(...)` at 420000 baud every 4 ms. The
-board's own USB-UART bridge (FPGA pins M2/N1) is an alternative that needs
-a revision with rx on M2.
+In the current `crsf2pwm_c4.qsf` the CRSF input `rx` sits on M2, the
+board's own USB-UART bridge: the same mini-USB that powers the board shows
+up as `/dev/ttyUSB0`, and a pyserial script built on `tb/model/crsf.py`
+sends `rc_frame(...)` at 420000 baud every 4 ms. The bridge is a CH340; it
+cannot do exactly 420000 and lands about 1.5 % off, well inside the
+receiver's tested +-3 %. LED3 should glow as soon as the script runs, LED2
+and LED0 follow with the first good frame.
 
 ## 4. Receiver
 
-Receiver TX to right header pin 3 (T14), receiver GND to pin 1, receiver
-5 V from pin 2 (the board's 5 V rail) or from a separate 5 V supply; never
-5 V onto a signal pin. Receiver RX stays open. Receiver settings: protocol
-CRSF, not inverted, 420000 baud.
+The receiver needs a header pin: in `crsf2pwm_c4.qsf` swap the two `rx`
+lines so that `rx` is on T14 (the M2 line is left there commented out),
+rebuild and reprogram. Then receiver TX to right header pin 3 (T14),
+receiver GND to pin 1, receiver 5 V from pin 2 (the board's 5 V rail) or
+from a separate 5 V supply; never 5 V onto a signal pin. Receiver RX stays
+open. Receiver settings: protocol CRSF, not inverted, 420000 baud.
 
 Transmitter on:
 
