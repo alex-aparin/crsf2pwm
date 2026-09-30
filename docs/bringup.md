@@ -76,12 +76,24 @@ That is correct: no frame yet, no pulses, the ESC would not arm. The LEDs:
 | LED3 | glowing while bytes arrive on rx, valid or not |
 
 In the current `crsf2pwm_c4.qsf` the CRSF input `rx` sits on M2, the
-board's own USB-UART bridge: the same mini-USB that powers the board shows
-up as `/dev/ttyUSB0`, and a pyserial script built on `tb/model/crsf.py`
-sends `rc_frame(...)` at 420000 baud every 4 ms. The bridge is a CH340; it
-cannot do exactly 420000 and lands about 1.5 % off, well inside the
-receiver's tested +-3 %. LED3 should glow as soon as the script runs, LED2
-and LED0 follow with the first good frame.
+board's own USB-UART bridge. Plug the board's mini-USB into the PC (it
+powers the board and shows up as `/dev/ttyUSB0`; the user must be in the
+`dialout` group) and play the receiver with `tools/crsf_send.py`, which
+builds the frames with `tb/model/crsf.py`. Needs pyserial:
+`sudo apt install python3-serial`.
+
+```
+tools/crsf_send.py --steer 172 --throttle 1811   # fixed values: 987.5 us on pin 5, 2011.9 us on pin 7
+tools/crsf_send.py --sweep 4                     # steer sweeps end to end every 4 s: watch the falling edge move
+tools/crsf_send.py --interactive                 # a/d steer, w/s throttle, c centre, 1..9 presets, q quit
+tools/crsf_send.py --bad-crc                     # every second frame spoiled: outputs must not twitch
+tools/crsf_send.py --duration 3                  # stops after 3 s: LED0 off and steer silent half a second later
+```
+
+The bridge is a CH340; it cannot do exactly 420000 baud and lands about
+1.5 % off, well inside the receiver's tested +-3 %. LED3 glows as soon as
+the script runs, LED2 and LED0 follow with the first good frame, LED1
+blinks.
 
 ## 4. Receiver
 
@@ -151,6 +163,7 @@ working as soon as the receiver talks.
 | Symptom | Look at |
 |---|---|
 | `quartus_pgm: command not found` | `. tools/quartus-env.sh` in this shell, or use the tools/ scripts, they source it |
+| Board on mini-USB but no `/dev/ttyUSB0` | Ubuntu's `brltty` grabs every CH340 as a Braille display and detaches the driver a second after it appears (`dmesg` shows `claimed by ch341 while 'brltty'`): `sudo apt purge brltty`, replug |
 | `Error code 87` / chain broken | section 1 |
 | Probe LEDs dark | oscillator pin, section 2 |
 | LED3 dark with receiver connected | rx wire, receiver protocol setting, receiver power |

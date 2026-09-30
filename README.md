@@ -125,6 +125,7 @@ tools/jtag-check.sh              cable found? board answering?
 tools/build.sh [revision]        compile, default crsf2pwm_c4; errors, warnings by code, LEs, slack
 tools/program.sh [revision]      into the FPGA over JTAG, gone at power-off
 tools/program.sh --flash         into the configuration flash, loads at every power-up
+tools/crsf_send.py [options]     play a receiver: CRSF frames from the PC over the board's USB-UART (pyserial)
 ```
 
 The step-by-step procedure with what to expect at each step, from the

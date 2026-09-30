@@ -53,10 +53,15 @@ waves-%:
 
 # PROCASSINIT is Verilator's objection to registers that get their power-up
 # value in the declaration and are then written in always_ff. That is the
-# style of this design on purpose: no reset, see docs/design.md. -Wfuture-
-# lets older Verilators that do not know the code accept the -Wno-.
+# style of this design on purpose: no reset, see docs/design.md. The code
+# only exists in recent Verilators (5.05x); older ones such as 5.020 in
+# Ubuntu 24.04 reject even -Wno- for it, -Wfuture- notwithstanding. So probe
+# once on a standalone file and pass the flag only when it is accepted.
+# Recursive (=) on purpose: evaluated only when the lint target runs.
+VLT_NO_PROCASSINIT = $(shell $(VERILATOR) --lint-only -Wno-PROCASSINIT ../rtl/crc8.sv >/dev/null 2>&1 && echo -Wno-PROCASSINIT)
+
 lint:
-	$(VERILATOR) --lint-only -Wall -Wfuture-PROCASSINIT -Wno-PROCASSINIT --top-module $(TOP) $(RTL)
+	$(VERILATOR) --lint-only -Wall $(VLT_NO_PROCASSINIT) --top-module $(TOP) $(RTL)
 
 # Test vectors are committed; this only needs Python when they change.
 vectors:
