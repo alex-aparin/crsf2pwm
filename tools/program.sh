@@ -8,8 +8,10 @@
 #   tools/program.sh crsf2pwm           MAX II: .pof, permanent by itself
 #
 # --flash converts the .sof with quartus_cpf. The flash type defaults to
-# EPCS16; set FLASH_DEVICE to what is on the board if the programmer
-# refuses (EPCS4, EPCS64, or the EPCSxx equivalent of a W25Qxx part).
+# EPCS4, which is what the Saylinx board answers with (silicon ID 0x12).
+# Another board: set FLASH_DEVICE from the ID the programmer prints when
+# it refuses: 0x10 EPCS1, 0x12 EPCS4, 0x14 EPCS16, 0x16 EPCS64, 0x18
+# EPCS128; W25Qxx parts report the EPCS code of the same size.
 #
 # Builds nothing: run tools/build.sh first.
 
@@ -45,7 +47,7 @@ fi
 # Flash: the device name for quartus_cpf is the part without speed grade.
 dev=$(sed -nE 's/^set_global_assignment -name DEVICE ([A-Za-z0-9]+).*/\1/p' "$rev.qsf")
 dev=${dev%%[CI][0-9]*}
-: "${FLASH_DEVICE:=EPCS16}"
+: "${FLASH_DEVICE:=EPCS4}"
 jic=output_files/$rev.jic
 
 echo "program: converting $sof to $jic for $FLASH_DEVICE behind $dev"

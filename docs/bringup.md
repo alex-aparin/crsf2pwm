@@ -132,13 +132,15 @@ The `.sof` is gone at power-off. The configuration flash keeps it:
 tools/program.sh --flash
 ```
 
-This converts the `.sof` to a `.jic` for an EPCS16 and writes it through
-the FPGA. If the programmer complains about the flash ID, read the
-marking of the small 8-pin chip next to the FPGA and set `FLASH_DEVICE`
-(EPCS4, EPCS16, EPCS64; a W25Q16 behaves as EPCS16, a W25Q64 as EPCS64):
+This converts the `.sof` to a `.jic` for an EPCS4, the 4 Mbit flash the
+Saylinx board answers with (silicon ID 0x12; the EP4CE6 image needs about
+3 Mbit), and writes it through the FPGA. On another board the programmer
+prints the ID it found in `Can't recognize silicon ID`: 0x10 EPCS1, 0x12
+EPCS4, 0x14 EPCS16, 0x16 EPCS64, 0x18 EPCS128, W25Qxx parts report the
+code of the EPCS of the same size. Then:
 
 ```
-FLASH_DEVICE=EPCS64 tools/program.sh --flash
+FLASH_DEVICE=EPCS16 tools/program.sh --flash
 ```
 
 Power-cycle the board: it must come up with the LEDs dark and start
