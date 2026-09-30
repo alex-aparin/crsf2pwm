@@ -90,41 +90,49 @@ The watchdog counts `start` strobes since the last `frame_valid`: a 5-bit
 counter instead of a 25-bit one at 50 MHz. Bad frames do not feed it, so a
 receiver that keeps sending garbage still trips it.
 
-## LE budget
+## Resources
 
-The EPM240 has 240 logic elements, one 4-input LUT and one register each.
-Estimates before the first Quartus run:
+Measured with Quartus Prime Lite 25.1std, default settings, no pins
+assigned. Logic cells after synthesis per module (own cells in
+parentheses), then what the fitter needed.
 
-| Block | Registers | LEs, estimate |
+| Module | Cyclone IV E, LCs | MAX II, LCs |
 |---|---|---|
-| rx synchroniser | 2 | 2 |
-| `uart_rx` | 3 state + 7 counter + 3 bit index + 8 shift + 2 strobes | 30 |
-| `crc8` | 8 | 14 |
-| `crsf_parser` | 2 state + 6 remaining + 1 is_rc + 13 gap + 22 shadows + 22 outputs + 1 strobe | 80 |
-| `pwm_timebase` | 8 acc + 1 tick + 15 counter + 1 head | 40 |
-| `pwm_chan` x2 | 11 down + 1 en + 1 pwm each | 34 |
-| watchdog and throttle mux | 5 counter + 2 flags | 20 |
-| **Total** | **~150** | **~220** |
+| `crsf_parser` incl. `crc8` | 99 (78) | 134 (110) |
+| `crc8` | 21 | 24 |
+| `pwm_timebase` | 47 | 56 |
+| `pwm_chan` steer | 17 | 18 |
+| `pwm_chan` throttle, absorbs the failsafe mux | 28 | 28 |
+| `uart_rx` | 32 | 38 |
+| top glue: sync, watchdog | 12 | 12 |
+| **Synthesis total** | **235** | **286** |
+| **Fitter** | **264 of 6272, 160 registers** | **266 needed, 240 available: does not fit** |
 
-Tight but plausible. Decisions already taken for the budget:
+Cyclone IV: 4 % of an EP4CE6, Fmax 132 MHz against the 50 MHz required,
+worst setup slack 12 ns. That is the target board now.
 
-- One timebase shared by both channels instead of two `pwm_out`: about
-  40 LEs saved.
-- Down counter per channel instead of a 12-bit width latch plus a 15-bit
-  comparator: about 12 LEs per channel.
-- `uart_rx` exposes its shift register as `data` instead of copying it:
-  8 LEs.
-- The watchdog counts periods, not clocks: about 20 LEs.
-
-If Quartus still reports more than 240, in order of preference:
+MAX II: the estimate of 220 was 20 % optimistic, mostly in the parser
+(110 own cells against 80 guessed: the byte-position decodes and the
+enable muxes on 44 shadow/output bits cost more than one LE per bit) and
+the timebase (56 against 40: two 15-bit compares plus the accumulator).
+The EPM240 is 26 cells short. If that target ever matters again, in order
+of preference:
 
 1. Count the parser's silence timeout in ticks from the timebase instead of
-   clocks: the 13-bit gap counter becomes 8 bits, about 6 LEs.
-2. Drop the parser's output registers and let the channels sample the
+   clocks: the 13-bit gap counter becomes 8 bits, about 8 LEs.
+2. Replace the timebase's two 15-bit equality compares by a single
+   terminal-count flag from a down counter, about 8 LEs.
+3. Drop the parser's output registers and let the channels sample the
    shadows, gated by a "frame complete and good" flag: 22 LEs, but the
-   `ch_a`/`ch_b` contract changes and the channel may skip a period.
-3. Shorten the failsafe counter or the UART counter widths only if the
-   parameters allow it; they are already minimal for the defaults.
+   `ch_a`/`ch_b` contract changes and a channel may skip a period.
+4. `OPTIMIZATION_TECHNIQUE AREA` and `AUTO_PACKED_REGISTERS_MAX` in the
+   .qsf, worth a few percent for free.
+
+Decisions already taken with the budget in mind, and still worth keeping
+on Cyclone IV because they cost nothing: one timebase shared by both
+channels, a down counter per channel instead of latch plus comparator,
+`uart_rx` exposing its shift register as `data`, a watchdog that counts
+periods rather than clocks.
 
 ## Verification
 
@@ -147,9 +155,9 @@ check that the committed vectors match the generator, and Verilator lint.
 `make lint` with `-Wall` is clean under Verilator 5.052 for both
 `crsf2pwm_top` and `pwm_out`.
 
-Not verified here: synthesis. Quartus is not installed on the Linux box
-the simulations run on; the LE table above is an estimate until the first
-compile.
+Synthesis: both Quartus revisions compile with 0 errors; the Cyclone IV
+revision fits and meets timing, the MAX II one does not fit (see
+Resources). Not verified yet: the design on a board.
 
 ## Decisions worth remembering
 

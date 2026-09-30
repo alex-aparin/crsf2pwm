@@ -141,9 +141,10 @@ module crsf_parser #(
   // when remaining == 23 - b. hit_x[j] says "byte_in carries shadow bit j
   // right now", src_x[j] is that bit.
   logic [10:0] src_a, hit_a, src_b, hit_b;
+  genvar j;                        // Quartus wants it declared outside the loop
 
   generate
-    for (genvar j = 0; j < 11; j++) begin : g_map
+    for (j = 0; j < 11; j++) begin : g_map
       localparam int PA = 11 * CH_A + j;
       localparam int PB = 11 * CH_B + j;
       localparam logic [5:0] RA = 6'(23 - PA / 8);
