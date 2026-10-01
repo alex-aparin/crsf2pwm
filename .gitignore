@@ -25,16 +25,19 @@ sim/results.xml
 __pycache__/
 *.pyc
 
-# KiCad
-hw/*-backups/
-hw/*.kicad_prl
-hw/fp-info-cache
-hw/*.lck
-hw/_autosave-*
-hw/*-save.kicad_*
-hw/*.kicad_sch-bak
-hw/*.kicad_pcb-bak
-hw/*~
+# KiCad. The project lives in hw/<board>/, so match at any depth under hw/.
+# .history/ is KiCad 10 Local History: autosave snapshots in a nested git
+# repo. *.lck is the open-file lock, .kicad_prl per-user UI state.
+hw/**/*-backups/
+hw/**/.history/
+hw/**/*.kicad_prl
+hw/**/fp-info-cache
+hw/**/*.lck
+hw/**/_autosave-*
+hw/**/*-save.kicad_*
+hw/**/*.kicad_sch-bak
+hw/**/*.kicad_pcb-bak
+hw/**/*~
 
 # Editors and OS. Shared VS Code tasks and settings are tracked.
 .vscode/*

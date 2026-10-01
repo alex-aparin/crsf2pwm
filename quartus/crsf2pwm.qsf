@@ -23,10 +23,11 @@ set_global_assignment -name SDC_FILE crsf2pwm.sdc
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED WITH WEAK PULL-UP"
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to *
 
-# Pin assignments. Fill in from docs/pinout.md after checking the board.
-# set_location_assignment PIN_12 -to clk
-# set_location_assignment PIN_xx -to rx
-# set_location_assignment PIN_xx -to steer
-# set_location_assignment PIN_xx -to throttle
+# Pin assignments for the own board, see docs/pinout.md. clk on GCLK0;
+# rx, steer, throttle on the adjacent bank 1 pins of the same package side.
+set_location_assignment PIN_12 -to clk
+set_location_assignment PIN_2 -to rx
+set_location_assignment PIN_3 -to steer
+set_location_assignment PIN_4 -to throttle
 
 set_global_assignment -name LAST_QUARTUS_VERSION "25.1std.0 Lite Edition"
