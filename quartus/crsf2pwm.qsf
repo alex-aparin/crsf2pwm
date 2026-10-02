@@ -23,11 +23,13 @@ set_global_assignment -name SDC_FILE crsf2pwm.sdc
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED WITH WEAK PULL-UP"
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to *
 
-# Pin assignments for the own board, see docs/pinout.md. clk on GCLK0;
-# rx, steer, throttle on the adjacent bank 1 pins of the same package side.
+# Pin assignments for the own board, see docs/pinout.md. clk on GCLK0 (bank 1,
+# package side 1); rx and the PWM outputs on bank 2 (sides 3 and 4), chosen
+# for the board layout. Pin 62 is also GCLK2; as an output that is fine,
+# GCLK1 (14) and GCLK3 (64) stay free.
 set_location_assignment PIN_12 -to clk
-set_location_assignment PIN_2 -to rx
-set_location_assignment PIN_3 -to steer
-set_location_assignment PIN_4 -to throttle
+set_location_assignment PIN_98 -to rx
+set_location_assignment PIN_55 -to steer
+set_location_assignment PIN_62 -to throttle
 
 set_global_assignment -name LAST_QUARTUS_VERSION "25.1std.0 Lite Edition"
