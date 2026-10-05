@@ -5207,6 +5207,162 @@
 		(layer "Edge.Cuts")
 		(uuid "96b3800e-a442-41af-9cc3-220a13f54fdc")
 	)
+	(gr_text "+5"
+		(at 45 70.5 0)
+		(layer "F.Cu")
+		(uuid "9bf24a04-1fa7-4be8-b706-6bd97aa92eac")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "+5"
+		(at 45 81 0)
+		(layer "F.Cu")
+		(uuid "5dac8bf0-e4c5-44b7-9ba2-9e0467428876")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "crx"
+		(at 45 83.5 0)
+		(layer "F.Cu")
+		(uuid "b238ca00-67ac-4654-82d4-c5784d8dec29")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "+5"
+		(at 45.5 56.5 0)
+		(layer "F.Cu")
+		(uuid "54fe66bb-9dfa-4190-b2d9-b85bed84d658")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "str"
+		(at 45.5 59 0)
+		(layer "F.Cu")
+		(uuid "88511ee6-2fa8-4cd0-ab3f-fdf9bd8b230a")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "thr"
+		(at 45.5 67.5 0)
+		(layer "F.Cu")
+		(uuid "99106c9c-eb4a-4c3b-8d48-6c1ceaccee75")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "-"
+		(at 46 54 0)
+		(layer "F.Cu")
+		(uuid "1df93ff0-fc55-4b40-91b4-e9473e273b0d")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "-\n"
+		(at 46 73 0)
+		(layer "F.Cu")
+		(uuid "03fb2be8-31b6-4335-a21d-b8d6e62587dc")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "-"
+		(at 46 78 0)
+		(layer "F.Cu")
+		(uuid "1220d734-9f06-4ad4-9e46-26bd6212cd45")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "+3"
+		(at 109 67 0)
+		(layer "F.Cu")
+		(uuid "f8f9a8e9-133f-4e0b-84ab-aa5cb3a2e8c0")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "-"
+		(at 109.5 69.5 0)
+		(layer "F.Cu")
+		(uuid "03e5461d-f407-41d3-aa8d-bc54a8f6f7ae")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "jtag"
+		(at 110 58 270)
+		(layer "F.Cu")
+		(uuid "3c535d78-e811-4e1c-81b9-794fbdea4bcd")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
 	(segment
 		(start 78.5 76.9625)
 		(end 79.0375 77.5)
