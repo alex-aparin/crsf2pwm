@@ -1,0 +1,82 @@
+# Board checks on every change under hw/, through actions-for-kicad/kicad-actions
+# (kicad-cli from the kicad/kicad:10.0 image, v2-k10.0 follows the 10.0.x patches).
+#
+#   ERC    schematic. The action fails on any ERC message, and the unused U1
+#          (CPLD) pins carry no no-connect flags yet, so the step is allowed to
+#          fail and the gate after it fails the job on anything but those pins.
+#          Once the pins have flags, drop continue-on-error and the gate.
+#   DRC    board, including the custom rules in the .kicad_dru. Blocking. The
+#          action has no switch for schematic parity; run that locally with
+#          kicad-cli pcb drc --schematic-parity.
+#   PDF    schematic, and the board as copper + silkscreen + outline. Both go
+#          to the run as the "board" artifact together with erc.rpt and drc.rpt.
+
+name: hw
+
+on:
+  push:
+    paths:
+      - hw/**
+      - .github/workflows/hw.yml
+  pull_request:
+    paths:
+      - hw/**
+      - .github/workflows/hw.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  board:
+    name: ERC, DRC, PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: ERC
+        uses: actions-for-kicad/kicad-actions@v2-k10.0
+        # exits 5 while U1 has unconnected pins, see the gate below
+        continue-on-error: true
+        with:
+          schematic_file_name: hw/crsf2pwm-board/crsf2pwm-board.kicad_sch
+          run_erc: true
+
+      - name: ERC gate
+        # erc.rpt lists one "[type]: text" line per message and one "@(x, y): item"
+        # line per item. Allowed: "Pin not connected" on U1. Anything else is
+        # printed and fails the job.
+        run: |
+          test -f erc.rpt || { echo "::error::no erc.rpt, the ERC step did not run"; exit 1; }
+          if grep -E '^\[|@\(' erc.rpt | grep -vE '^\[pin_not_connected\]|Symbol U1 Pin'; then
+            echo "::error::ERC messages other than unused U1 pins, see erc.rpt in the artifact"
+            exit 1
+          fi
+          grep 'ERC messages' erc.rpt
+
+      - name: DRC, schematic and board PDF
+        uses: actions-for-kicad/kicad-actions@v2-k10.0
+        with:
+          schematic_file_name: hw/crsf2pwm-board/crsf2pwm-board.kicad_sch
+          schematic_output_pdf: true
+          pcb_file_name: hw/crsf2pwm-board/crsf2pwm-board.kicad_pcb
+          run_drc: true
+          pcb_output_pdf: true
+          pcb_output_layers: F.Cu,B.Cu,F.SilkS,B.SilkS,Edge.Cuts
+
+      - name: Keep reports and PDFs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: board
+          path: |
+            erc.rpt
+            drc.rpt
+            schematic.pdf
+            pcb.pdf
+          retention-days: 30

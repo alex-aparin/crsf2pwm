@@ -1,6 +1,7 @@
 # crsf2pwm
 
 [![sim](https://github.com/alex-aparin/crsf2pwm/actions/workflows/sim.yml/badge.svg)](https://github.com/alex-aparin/crsf2pwm/actions/workflows/sim.yml)
+[![hw](https://github.com/alex-aparin/crsf2pwm/actions/workflows/hw.yml/badge.svg)](https://github.com/alex-aparin/crsf2pwm/actions/workflows/hw.yml)
 
 CRSF-to-PWM converter for an RC car: receives CRSF from an ExpressLRS or
 Crossfire receiver over UART and outputs two servo PWM signals, one for the
@@ -93,6 +94,12 @@ testbenches in Icarus (`make -C sim -k all`), the Python model self-test with
 a check that the committed `tb/vectors/` match the generator, and Verilator
 lint of the RTL with `-Wall`. The waveforms of a failed run are attached to
 the run as an artifact for a week. The badge above shows the state of `main`.
+
+`.github/workflows/hw.yml` runs on changes under `hw/`: ERC of the schematic
+and DRC of the board with kicad-cli 10.0 (through `actions-for-kicad/kicad-actions`),
+plus a PDF of the schematic and of the board layers. Reports and PDFs are
+attached to the run as the `board` artifact for 30 days. ERC tolerates only
+"Pin not connected" on the unused U1 pins, which have no no-connect flags yet.
 
 ## VS Code
 
