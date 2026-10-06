@@ -4,7 +4,7 @@
 #
 #   tools/build.sh                the board revision, crsf2pwm_c4
 #   tools/build.sh clock_probe    the bring-up probe
-#   tools/build.sh crsf2pwm       the MAX II revision (does not fit yet)
+#   tools/build.sh crsf2pwm       the MAX II revision (234 of 240 LEs, no room to spare)
 #
 # Full log: quartus/output_files/<revision>.build.log
 

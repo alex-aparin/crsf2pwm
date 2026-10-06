@@ -32,4 +32,13 @@ set_location_assignment PIN_57 -to rx
 set_location_assignment PIN_55 -to steer
 set_location_assignment PIN_56 -to throttle
 
+# Area. The EPM240 has 240 LEs and the design needs 266 with the defaults.
+# Packing unrelated LUTs and registers into one LE is what makes it fit;
+# area optimisation and binary state encoding buy a few more. Measured with
+# 25.1std: 234 of 240, worst setup slack 5.1 ns at 50 MHz. See
+# docs/design.md, Resources, for what the RTL could still give back.
+set_global_assignment -name AUTO_PACKED_REGISTERS_MAXII "MINIMIZE AREA WITH CHAINS"
+set_global_assignment -name OPTIMIZATION_TECHNIQUE AREA
+set_global_assignment -name STATE_MACHINE_PROCESSING "MINIMAL BITS"
+
 set_global_assignment -name LAST_QUARTUS_VERSION "25.1std.0 Lite Edition"

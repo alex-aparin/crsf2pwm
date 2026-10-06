@@ -114,7 +114,7 @@ The Quartus project `quartus/crsf2pwm.qpf` has three revisions:
 |---|---|---|
 | `crsf2pwm_c4` | the Saylinx Cyclone IV board, EP4CE6F17C8N | `.sof`, and `.jic` for the flash |
 | `clock_probe` | the same board, bring-up helper: oscillator to LEDs and header pins | `.sof` |
-| `crsf2pwm` | MAX II EPM240 | `.pof`; does not fit yet, see `docs/design.md` |
+| `crsf2pwm` | MAX II EPM240 | `.pof`; 234 of 240 LEs with the area settings in the `.qsf`, see `docs/design.md` |
 
 Everything goes through the scripts in `tools/`, which find Quartus, check
 the cable and print the numbers that matter:

@@ -106,7 +106,7 @@ parentheses), then what the fitter needed.
 | `uart_rx` | 32 | 38 |
 | top glue: sync, watchdog | 12 | 12 |
 | **Synthesis total** | **235** | **286** |
-| **Fitter** | **264 of 6272, 160 registers** | **266 needed, 240 available: does not fit** |
+| **Fitter** | **264 of 6272, 160 registers** | **266 with the default settings: does not fit. 234 of 240 with the area settings in the .qsf, 162 registers** |
 
 Cyclone IV: 4 % of an EP4CE6, Fmax 132 MHz against the 50 MHz required,
 worst setup slack 12 ns. That is the target board now.
@@ -115,18 +115,27 @@ MAX II: the estimate of 220 was 20 % optimistic, mostly in the parser
 (110 own cells against 80 guessed: the byte-position decodes and the
 enable muxes on 44 shadow/output bits cost more than one LE per bit) and
 the timebase (56 against 40: two 15-bit compares plus the accumulator).
-The EPM240 is 26 cells short. If that target ever matters again, in order
-of preference:
+With the defaults the EPM240 is 26 cells short. What makes it fit is the
+fitter packing unrelated LUTs and registers into one LE:
+`AUTO_PACKED_REGISTERS_MAXII "MINIMIZE AREA WITH CHAINS"` takes 266 to
+238, `OPTIMIZATION_TECHNIQUE AREA` plus `STATE_MACHINE_PROCESSING
+"MINIMAL BITS"` to 234, worst setup slack 5.1 ns. That is 98 %: nothing
+more goes in without giving something back. What the RTL could give back,
+measured 2026-10-06 in scratch copies with those settings, fitted cells:
 
-1. Count the parser's silence timeout in ticks from the timebase instead of
-   clocks: the 13-bit gap counter becomes 8 bits, about 8 LEs.
-2. Replace the timebase's two 15-bit equality compares by a single
-   terminal-count flag from a down counter, about 8 LEs.
-3. Drop the parser's output registers and let the channels sample the
-   shadows, gated by a "frame complete and good" flag: 22 LEs, but the
-   `ch_a`/`ch_b` contract changes and a channel may skip a period.
-4. `OPTIMIZATION_TECHNIQUE AREA` and `AUTO_PACKED_REGISTERS_MAX` in the
-   .qsf, worth a few percent for free.
+| Change | LEs | Contract |
+|---|---|---|
+| as is | 234 | |
+| timebase tick from a 5-bit sub counter plus a 2-bit phase instead of the add-8-modulo-250 accumulator, same 32/31/31/31 pattern | 227 | unchanged |
+| parser silence timeout counted in timebase ticks: 8-bit gap counter instead of 13, `tick` input on the parser | 228 | unchanged, `GAP_US` stays |
+| both of the above | 221 | unchanged |
+| plus a 32768-tick period, 20.48 ms: the counter wraps by itself, `start` from the carry out, `head` = `cnt < 1408` combinational | 211 | period 20.48 ms, the testbenches expect 20 ms |
+
+A combinational `head` on its own saves nothing once registers are packed.
+Not measured: dropping the parser's output registers and letting the
+channels sample the shadows gated by a "frame complete and good" flag,
+22 registers, but the `ch_a`/`ch_b` contract changes and a channel may
+skip a period.
 
 Decisions already taken with the budget in mind, and still worth keeping
 on Cyclone IV because they cost nothing: one timebase shared by both
