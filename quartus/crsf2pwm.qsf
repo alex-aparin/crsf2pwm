@@ -24,13 +24,36 @@ set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED WITH WE
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to *
 
 # Pin assignments for the own board, see docs/pinout.md. clk on GCLK3 (pin 64,
-# bank 2, package side 3); steer, throttle and rx side by side on pins 55..57,
-# same bank and side, chosen for the board layout. GCLK0 (12), GCLK1 (14) and
-# GCLK2 (62) stay free; bank 1 carries only JTAG.
+# bank 2, package side 3). steer, throttle and rx each take a pair of adjacent
+# package pins, 49+50, 51+52 and 54+55: the port sits on the first pin, the
+# second is reserved below as a tri-stated input and both pads are joined on
+# the board. A solder bridge inside a pair changes nothing and the pad is
+# twice as wide. 53, 56 and 57 stay free as spacers. The pairs straddle the
+# bank 1 / bank 2 boundary (51 / 52), both banks run at 3.3 V. GCLK0 (12),
+# GCLK1 (14) and GCLK2 (62) stay free.
 set_location_assignment PIN_64 -to clk
-set_location_assignment PIN_57 -to rx
-set_location_assignment PIN_55 -to steer
-set_location_assignment PIN_56 -to throttle
+set_location_assignment PIN_54 -to rx
+set_location_assignment PIN_49 -to steer
+set_location_assignment PIN_51 -to throttle
+
+# Second pin of each pair, tri-stated without the pull-up so it does not load
+# the line. 58 is tied to VCCIO2 (59) and 61 to GNDIO (60) on the board for
+# wider power pads; a tri-stated input is the one state that is safe against
+# either rail whatever RESERVE_ALL_UNUSED_PINS above becomes. A reserved pin
+# is a named node that exists only here: the location names the pin, the
+# RESERVE_PIN assignment makes the fitter create it. (RESERVE_PIN straight
+# "-to PIN_50" does not do that: the fitter takes PIN_50 as a node name and
+# places it anywhere.)
+set_location_assignment PIN_50 -to steer_pair
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to steer_pair
+set_location_assignment PIN_52 -to throttle_pair
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to throttle_pair
+set_location_assignment PIN_55 -to rx_pair
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to rx_pair
+set_location_assignment PIN_58 -to vccio2_pair
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to vccio2_pair
+set_location_assignment PIN_61 -to gndio_pair
+set_instance_assignment -name RESERVE_PIN "AS INPUT TRI-STATED" -to gndio_pair
 
 # Area. The EPM240 has 240 LEs and the design needs 266 with the defaults.
 # Packing unrelated LUTs and registers into one LE is what makes it fit;

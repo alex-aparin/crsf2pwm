@@ -22,10 +22,20 @@ low.
 | Net | Module port | Cyclone IV pin | EPM240 pin | Board connector | Notes |
 |---|---|---|---|---|---|
 | CLK50 | clk | E1 | 64 (GCLK3) | on-board oscillator | 50 MHz, dedicated clock input |
-| CRSF_RX | rx | M2 | 57 | on-board USB-UART bridge, PC -> FPGA | frames from a PC over the board's mini-USB; for a receiver switch to T14 (right header pin 3, GND pin 1), 3.3 V, idle high, receiver RX pin left open |
-| STEER | steer | T13 | 55 | right header pin 5 | servo powered separately, 220 ohm .. 1 k series resistor |
-| THROTTLE | throttle | T12 | 56 | right header pin 7 | ESC powered separately, same resistor |
+| CRSF_RX | rx | M2 | 54 + 55 | on-board USB-UART bridge, PC -> FPGA | frames from a PC over the board's mini-USB; for a receiver switch to T14 (right header pin 3, GND pin 1), 3.3 V, idle high, receiver RX pin left open |
+| STEER | steer | T13 | 49 + 50 | right header pin 5 | servo powered separately, 220 ohm .. 1 k series resistor |
+| THROTTLE | throttle | T12 | 51 + 52 | right header pin 7 | ESC powered separately, same resistor |
 | LED0..3 | led[0..3] | D9, C9, F9, E10 | | on-board LEDs, light on 1 | status: link, frames, first frame, rx activity |
+
+On the EPM240 each signal takes a pair of adjacent package pins. The port
+sits on the first pin of the pair; the second is reserved in the `.qsf` as
+a tri-stated input (`RESERVE_PIN`) and both pads are joined on the board,
+so the pad is twice as wide and a solder bridge inside the pair changes
+nothing. Pins 53, 56 and 57 stay free as spacers. In the same spirit pin 58
+is tied to VCCIO2 (pin 59) and pin 61 to GNDIO (pin 60), both reserved as
+tri-stated inputs: the one state that is safe against either rail, whatever
+the global unused-pin setting becomes. The pairs straddle the I/O bank
+boundary (51 is bank 1, 52 bank 2); both banks run at 3.3 V.
 
 Other board resources, from the AX4010 data, for later: keys M15, M16,
 E16 and reset N13 (with pull-ups); the on-board USB-UART bridge connects

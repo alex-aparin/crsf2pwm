@@ -273,7 +273,16 @@
     "equivalence_files": []
   },
   "erc": {
-    "erc_exclusions": [],
+    "erc_exclusions": [
+      [
+        "pin_to_pin|1435100|698500|a3678468-b318-467f-95d6-afe41efb6552|b60bf8a2-57cf-4b59-bae1-3e146111f5c1|/74a48d9f-cae4-4da3-8be4-5d09084c7a6e|/74a48d9f-cae4-4da3-8be4-5d09084c7a6e|/74a48d9f-cae4-4da3-8be4-5d09084c7a6e",
+        "U1 pin 58 is reserved as a tri-stated input in the .qsf and joined to the VCCIO2 pad 59 for a wider pad"
+      ],
+      [
+        "pin_to_pin|1435100|723900|6399dddd-031b-4e71-8d67-ffc5298f4aea|5202205c-ca60-4f83-8ed1-afedb423011c|/74a48d9f-cae4-4da3-8be4-5d09084c7a6e|/74a48d9f-cae4-4da3-8be4-5d09084c7a6e|/74a48d9f-cae4-4da3-8be4-5d09084c7a6e",
+        "U1 pin 61 is reserved as a tri-stated input in the .qsf and joined to the GNDIO pad 60 for a wider pad"
+      ]
+    ],
     "meta": {
       "version": 0
     },
