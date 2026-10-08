@@ -3,3 +3,9 @@
 	(condition "A.intersectsArea('cpld') || B.intersectsArea('cpld')")
 	(constraint clearance (min 0.2mm))
 	(constraint track_width (min 0.2mm) (opt 0.25mm) (max 0.3mm)))
+
+# Later rules win: the pour keeps the full clearance inside the cpld area,
+# tracks there stay at 0.2 mm between themselves (hand-soldering margin).
+(rule "cpld_pour"
+	(condition "A.Type == 'Zone' && B.intersectsArea('cpld')")
+	(constraint clearance (min 0.5mm)))
