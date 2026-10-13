@@ -1,7 +1,8 @@
-# Timing constraints.
+# Timing constraints for the MAX II revision (crsf2pwm.qsf), the own board.
+# The Cyclone IV revision uses crsf2pwm_c4.sdc.
 
-# 50 MHz from the board oscillator.
-create_clock -name clk50 -period 20.000 [get_ports clk]
+# 25 MHz from Y1 on the board. Matches CLK_HZ in crsf2pwm.qsf.
+create_clock -name clk25 -period 40.000 [get_ports clk]
 
 derive_clock_uncertainty
 

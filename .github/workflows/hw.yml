@@ -10,6 +10,8 @@
 #          kicad-cli pcb drc --schematic-parity.
 #   PDF    schematic, and the board as copper + silkscreen + outline. Both go
 #          to the run as the "board" artifact together with erc.rpt and drc.rpt.
+#   BOM    bom.csv from the schematic fields Manufacturer / MPN / LCSC, one
+#          line per reference (the action has no group-by), same artifact.
 
 name: hw
 
@@ -33,7 +35,7 @@ concurrency:
 
 jobs:
   board:
-    name: ERC, DRC, PDF
+    name: ERC, DRC, PDF, BOM
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -59,17 +61,20 @@ jobs:
           fi
           grep 'ERC messages' erc.rpt
 
-      - name: DRC, schematic and board PDF
+      - name: DRC, schematic PDF, BOM, board PDF
         uses: actions-for-kicad/kicad-actions@v2-k10.0
         with:
           schematic_file_name: hw/crsf2pwm-board/crsf2pwm-board.kicad_sch
           schematic_output_pdf: true
+          schematic_output_bom: true
+          schematic_output_bom_fields: Reference,Value,Footprint,Manufacturer,MPN,LCSC,${QUANTITY},${DNP}
+          schematic_output_bom_labels: Reference,Value,Footprint,Manufacturer,MPN,LCSC,Qty,DNP
           pcb_file_name: hw/crsf2pwm-board/crsf2pwm-board.kicad_pcb
           run_drc: true
           pcb_output_pdf: true
           pcb_output_layers: F.Cu,B.Cu,F.SilkS,B.SilkS,Edge.Cuts
 
-      - name: Keep reports and PDFs
+      - name: Keep reports, PDFs and BOM
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -78,5 +83,6 @@ jobs:
             erc.rpt
             drc.rpt
             schematic.pdf
+            bom.csv
             pcb.pdf
           retention-days: 30

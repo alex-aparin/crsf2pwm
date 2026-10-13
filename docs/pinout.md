@@ -21,7 +21,7 @@ low.
 
 | Net | Module port | Cyclone IV pin | EPM240 pin | Board connector | Notes |
 |---|---|---|---|---|---|
-| CLK50 | clk | E1 | 64 (GCLK3) | on-board oscillator | 50 MHz, dedicated clock input |
+| CLK50 | clk | E1 | 64 (GCLK3) | on-board oscillator | dedicated clock input; 50 MHz on the Saylinx board, 25 MHz (Y1) on the own board, set as `CLK_HZ` in `crsf2pwm.qsf` and as the period in its `.sdc` |
 | CRSF_RX | rx | M2 | 54 + 55 | on-board USB-UART bridge, PC -> FPGA | frames from a PC over the board's mini-USB; for a receiver switch to T14 (right header pin 3, GND pin 1), 3.3 V, idle high, receiver RX pin left open |
 | STEER | steer | T13 | 49 + 50 | right header pin 5 | servo powered separately, 220 ohm .. 1 k series resistor |
 | THROTTLE | throttle | T12 | 51 + 52 | right header pin 7 | ESC powered separately, same resistor |

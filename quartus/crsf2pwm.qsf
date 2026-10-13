@@ -18,6 +18,12 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pwm_chan.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../rtl/pwm_out.sv
 set_global_assignment -name SDC_FILE crsf2pwm.sdc
 
+# Clock. Y1 on the board is a 25 MHz oscillator (the RTL default is 50 MHz,
+# the Saylinx board). Every divider in the RTL derives from CLK_HZ: 59 clocks
+# per UART bit (+0.9 % baud error, the receiver is tested to +-3 %), tick
+# accumulator +8 mod 125, same 1.6 MHz tick. Keep in step with crsf2pwm.sdc.
+set_parameter -name CLK_HZ 25000000
+
 # Unused pins: input with weak pull-up instead of output driving ground.
 # Safe for a board where other things are wired to the pins.
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED WITH WEAK PULL-UP"
